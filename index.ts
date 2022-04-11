@@ -134,9 +134,9 @@ function outputUniqueOptimalWords(wordCollection: string[][]): void {
 
   const CSV = wordCollection.reduce((lines, collection, index) => {
     const maybeNewLines = index > 0 ? '\n\n' : '';
-    lines = lines.concat(`${maybeNewLines}${headings[index]}`);
+    lines = lines.concat(`${maybeNewLines}${headings[index]},`);
 
-    return collection.reduce((lines, word) => lines.concat(`\n${word}`), lines);
+    return collection.reduce((lines, word) => lines.concat(`\n${word},`), lines);
   }, '');
 
   writeCSV(
