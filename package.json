@@ -4,6 +4,7 @@
   "description": "Analyzing Wordle",
   "main": "index.ts",
   "scripts": {
+    "analyze": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Andrew A. Lee",
