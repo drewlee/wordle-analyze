@@ -1,4 +1,4 @@
-#wordle-analyze
+# wordle-analyze
 
 ## Setup
 
