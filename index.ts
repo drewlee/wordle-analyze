@@ -3,17 +3,16 @@ import WORDS_PLAYABLE from './words-playable';
 import { join } from 'path';
 import { existsSync, writeFileSync } from 'fs';
 
-type Word = string;
 type LetterDistribution = Map<string, number[]>;
-type WordsWithOccurrences = Map<Word, Set<number>>;
-type WordsWithRank = Map<Word, number>;
+type WordsWithOccurrences = Map<string, Set<number>>;
+type WordsWithRank = Map<string, number>;
 
 const OUT_DIR = 'out';
 
 function getLetterDistribution(): LetterDistribution {
   const letterDistribution = WORDS_PLAYABLE.reduce((
     distribution: LetterDistribution,
-    word: Word,
+    word: string,
     wordIndex: number,
   ) => {
     const uniqueLetters = Array.from(new Set(word.split('')));
@@ -39,7 +38,7 @@ function getLetterDistribution(): LetterDistribution {
 function getOptimalWords(distribution: LetterDistribution): WordsWithRank {
   const wordsWithOccurrences = WORDS_GUESSABLE.reduce((
     words: WordsWithOccurrences,
-    word: Word,
+    word: string,
   ) => {
     const occurrences = word.split('').reduce((occurrences: number[], letter: string) => {
       return occurrences.concat(distribution.get(letter)!);
@@ -127,21 +126,27 @@ function outputUniqueOptimalWords(wordCollection: string[][]): void {
     'Unique Optimal Words (Double Overlap)',
   ];
 
-  wordCollection.forEach((collection, index) => {
+  wordCollection.forEach((collection: string[], index: number) => {
     console.log(`\n${headings[index]}`);
     collection.forEach((word) => console.log(word));
   });
 
-  const CSV = wordCollection.reduce((lines, collection, index) => {
-    const maybeNewLines = index > 0 ? '\n\n' : '';
-    lines = lines.concat(`${maybeNewLines}${headings[index]},`);
+  const CSV = wordCollection.reduce((rows: string[], collection: string[], colIndex: number) => {
+    const maybeComma = colIndex > 0 ? ',' : '';
 
-    return collection.reduce((lines, word) => lines.concat(`\n${word},`), lines);
-  }, '');
+    return collection.reduce((rows: string[], word: string, rowIndex: number) => {
+      const columns = rows[rowIndex] || ','.repeat(colIndex > 0 ? colIndex - 1 : 0);
+      rows[rowIndex] = columns.concat(maybeComma, word);
+
+      return rows;
+    }, rows);
+  }, ['\n'])
+  .join('\n');
 
   writeCSV(
     'unique-optimal-words',
     CSV,
+    headings,
   );
 }
 
